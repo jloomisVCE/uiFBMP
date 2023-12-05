@@ -121,8 +121,8 @@ function mouseover() {
 
   function mousemove() {
     // recover coordinate we need
-    var x0 = yScale.invert(d3.mouse(this)[1]);
-    var i = d3.bisectRight(trendEst,x0);
+    var y0 = yScale.invert(d3.mouse(this)[1]);
+    var i = d3.bisectRight(trendEst,y0);
 
     var selectedData = trendSummary[i]
 
