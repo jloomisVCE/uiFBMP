@@ -107,12 +107,15 @@ svg.selectAll("circle")
 .attr("stroke", d => d.StatSig ? "black" : "gray")
 .on('mouseover', mouseover)
 .on('mousemove', mousemove)
-.on('mouseout', mouseout);
+.on('mouseout', mouseout)
+.on('click', clickon);
 
 // What happens when the mouse move -> show the annotations at the right positions.
 function mouseover() {
     focus.style("opacity", 1)
-    focusText.style("opacity",1).style("font-size","18px").style("white-space","pre-line")
+    focusText.style("opacity",1)
+             .style("font-size","18px")
+             .style("white-space","pre-line")
     focusDrop.style("opacity",0.75)
   }
 
@@ -120,8 +123,6 @@ function mouseover() {
     // recover coordinate we need
     var x0 = yScale.invert(d3.mouse(this)[1]);
     var i = d3.bisectRight(trendEst,x0);
-
-    console.log(i)
 
     var selectedData = trendSummary[i]
 
@@ -131,6 +132,7 @@ function mouseover() {
     focusText
       .html(selectedData.species)
       .style("font-size","18px")
+      .style("font-weight","bold")
       .attr("x", xScale(i+3))
       .attr("y", yScale(selectedData.trend))
     focusDrop
@@ -146,6 +148,16 @@ function mouseover() {
     focusDrop.style("opacity",0)
   }
 
+  /* Attempt to add on click to this plot 
+     that will provide the species name 
+     and bring you to the state trend 
+  */
+
+  function clickon() {
+    // recover coordinate we need
+    var sppSelect = d3.select(this).data()[0].species;
+    console.log("Congratulations! You've selected: " + sppSelect);
+    }
 
 // Draw the horizontal dashed line
 svg.append("line")
@@ -158,7 +170,7 @@ svg.append("line")
 
 // Draw y-axis
 svg.append('g')
-    .attr('transform', `translate(${margin.left-10})`)
+    .attr('transform', `translate(${margin.left})`)
     .call(d3.axisLeft(yScale));
 
 svg.append("text")
@@ -167,7 +179,7 @@ svg.append("text")
 // this is a little weird because it's rotated 90 degrees
 // the x here is actually where on the y axis that I want it
 // The y axis here is actually where I want it on the x axis
-.attr("y", -26)
+.attr("y", innerHeight*0.8)
 .attr("x", -200-((margin.right+margin.left)))
 .attr("transform", "rotate(-90)")
 .text('Trend');
