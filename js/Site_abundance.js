@@ -35,25 +35,35 @@ var xScale = d3.scaleLinear()
  .range([margin.left, innerWidth])
 
  console.log(xScale(2020));
+ console.log("max UCI: " + d3.max(site_data.map(d => d.UCI)));
 
 var yScale = d3.scaleLinear()
  .domain([d3.min(site_data.map(d => d.LCI)), d3.max(site_data.map(d => d.UCI))])
  .range([innerHeight, margin.top]);
 
+ var uniqueSpp = [...new Set(site_data.map(data => data.species))];
+ console.log(uniqueSpp);
 
+function plotSpp(SPP){
 var sppIndices = site_data
-    .map((e, i) => e.species === 'BTBW' ? i : -1)
+    .map((e, i) => e.species === SPP ? i : -1)
     .filter(index => index !== -1);
 
-var RA_spp = sppIndices.map(i => site_data[i].RelativeAbundance)
+// var RA_spp = sppIndices.map(i => site_data[i].RelativeAbundance)
+// var RA_year = sppIndices.map(i => site_data[i].year)
 
   // Draw the line
   svg.append('path')
-    .datum(RA_spp)
+    // this gets just the data that I want for each species 
+    // i.e., filters the array
+    .datum(sppIndices.map(i => site_data[i]))
     .attr('fill', 'none')
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
     .attr("d", d3.line()
-              .x(function(d) { return xScale(d.year) })
-              .y(function(d) { return yScale(d.RelativeAbundance) })
+              .x(function(d){ return xScale(d.year) })
+              .y(function(d){ return yScale(d.RelativeAbundance) })
               );
+}
+
+uniqueSpp.map(i => plotSpp(i))
