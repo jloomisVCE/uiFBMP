@@ -20,8 +20,8 @@ var SA_positionInfo = SA_element_info.getBoundingClientRect();
                    left: width*0.15 };
   
   // Calculate the inner dimensions of the plot
-  var innerWidth = width - margin.left - margin.right;
-  var innerHeight = height - margin.top - margin.bottom;
+  var sa_innerWidth = width - margin.left - margin.right;
+  var sa_innerHeight = height - margin.top - margin.bottom;
 
   // Create the SVG container
  var svg = d3.select("#" + 'Site_Relative_Abundance')
@@ -32,14 +32,14 @@ var SA_positionInfo = SA_element_info.getBoundingClientRect();
 // Create scales for x and y axes
 var xScale = d3.scaleLinear()
  .domain([d3.min(site_data.map(d => d.year))-1, d3.max(site_data.map(d => d.year))+1])
- .range([margin.left, innerWidth])
+ .range([margin.left, sa_innerWidth])
 
  console.log(xScale(2020));
  console.log("max UCI: " + d3.max(site_data.map(d => d.UCI)));
 
 var yScale = d3.scaleLinear()
  .domain([d3.min(site_data.map(d => d.LCI)), d3.max(site_data.map(d => d.UCI))])
- .range([innerHeight, margin.top]);
+ .range([sa_innerHeight, margin.top]);
 
  var uniqueSpp = [...new Set(site_data.map(data => data.species))];
  console.log(uniqueSpp);
@@ -49,7 +49,7 @@ svg.append("text")
 .attr("class", "x label")
 .attr("text-anchor", "middle")
 .attr("x", xScale(2005))
-.attr("y", innerHeight + 50)
+.attr("y", sa_innerHeight + 50)
 .text('Year');
 
 svg.append("text")
@@ -65,7 +65,7 @@ svg.append("text")
 
   // Draw x-axis
   svg.append('g')
-    .attr('transform', `translate(0, ${innerHeight})`)
+    .attr('transform', `translate(0, ${sa_innerHeight})`)
     .call(d3.axisBottom(xScale));
 
   // Draw y-axis
@@ -105,50 +105,50 @@ var SA_element_info = document.getElementById('site_abundance_div');
 var SA_positionInfo = SA_element_info.getBoundingClientRect();
 
   // Set up the SVG dimensions
-  var width = SA_positionInfo.width;
-  var height = SA_positionInfo.height;
+  var sa_width = SA_positionInfo.width;
+  var sa_height = SA_positionInfo.height;
   
-  console.log('width = ' + width)
+  console.log('width = ' + sa_width)
 
   // Set up the margins
-  var margin = { top: height*0.05,
-                   bottom: height*0.1,
-                   right: width*0.05,  
-                   left: width*0.15 };
+  var sa_margin = { top: sa_height*0.05,
+                   bottom: sa_height*0.1,
+                   right: sa_width*0.05,  
+                   left: sa_width*0.15 };
   
   // Calculate the inner dimensions of the plot
-  var innerWidth = width - margin.left - margin.right;
-  var innerHeight = height - margin.top - margin.bottom;
+  var sa_innerWidth = sa_width - (sa_margin.left + sa_margin.right);
+  var sa_innerHeight = sa_height - (sa_margin.top + sa_margin.bottom);
 
-const marginTop = margin.top;
-const marginRight = margin.right;
-const marginBottom = margin.bottom;
-const marginLeft = margin.left;
+var marginTop = sa_margin.top;
+var marginRight = sa_margin.right;
+var marginBottom = sa_margin.bottom;
+var marginLeft = sa_margin.left;
 
 var voronoi = false;
 
 // Create the positional scales.
-const x = d3.scaleLinear()
+var x = d3.scaleLinear()
   .domain(d3.extent(site_data, d => d.year)).nice()
-  .range([marginLeft, width - marginRight]);
+  .range([marginLeft, sa_width - marginRight]);
 
-const y = d3.scaleLinear()
+var y = d3.scaleLinear()
   .domain([0, d3.max(site_data, d => d.RelativeAbundance)]).nice()
-  .range([height - marginBottom, marginTop]);
+  .range([sa_height - marginBottom, marginTop]);
 
 // Create the SVG container.
-const svg = d3
+var svg = d3
     .select("#"+"Site_Relative_Abundance")
     .append('svg')
-    .attr("width", width)
-    .attr("height", height)
-    .attr("viewBox", [0, 0, width, height])
+    .attr("width", sa_width)
+    .attr("height", sa_height)
+    .attr("viewBox", [0, 0, sa_width, sa_height])
     .attr("style", "max-width: 100%; height: auto; overflow: visible; font: 12px sans-serif;");
 
 // Add the horizontal axis.
 svg.append("g")
-    .attr("transform", `translate(0,${height - marginBottom})`)
-    .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
+    .attr("transform", `translate(0,${sa_height - marginBottom})`)
+    .call(d3.axisBottom(x).ticks(sa_width / 80).tickSizeOuter(0));
 
 // Add the vertical axis.
 svg.append("g")
@@ -156,20 +156,21 @@ svg.append("g")
     .call(d3.axisLeft(y))
     .call(g => g.select(".domain").remove())
     .call(voronoi ? () => {} : g => g.selectAll(".tick line").clone()
-        .attr("x2", width - marginLeft - marginRight)
+        .attr("x2", sa_width - marginLeft - marginRight)
         .attr("stroke-opacity", 0.1))
     .call(g => g.append("text")
-        .attr("x", -marginLeft)
-        .attr("y", y(d3.max(site_data, d => d.RelativeAbundance)/2))
+       .attr("y", 0 - (sa_margin.left/2))
+       .attr("x", 0 - (sa_innerHeight / 2) - (marginBottom + marginTop)  )  
         .attr("fill", "currentColor")
         .attr("text-anchor", "start")
-        .style("font-size", 16)
+        .style("font-size", "12pt")
+        .style("font-weight","bold")
         .text("Relative Abundance")
         .attr("transform", "rotate(-90)"));
 
 
 // Compute the points in pixel space as [x, y, z], where z is the name of the series.
-const points = site_data.map((d) => [x(d.year), y(d.RelativeAbundance), d.species]);
+var points = site_data.map((d) => [x(d.year), y(d.RelativeAbundance), d.species]);
 
 // An optional Voronoi display (for fun).
 if (voronoi) svg.append("path")
@@ -177,15 +178,15 @@ if (voronoi) svg.append("path")
     .attr("stroke", "#ccc")
     .attr("d", d3.Delaunay
       .from(points)
-      .voronoi([0, 0, width, height])
+      .voronoi([0, 0, sa_width, sa_height])
       .render());
 
 // Group the points by series.
-const groups = d3.rollup(points, v => Object.assign(v, {z: v[0][2]}), d => d[2]);
+var groups = d3.rollup(points, v => Object.assign(v, {z: v[0][2]}), d => d[2]);
 
 // Draw the lines.
-const line = d3.line();
-const path = svg.append("g")
+var line = d3.line();
+var path = svg.append("g")
     .attr("fill", "none")
     .attr("stroke", "gray")
     .attr("stroke-width", 1)
@@ -198,7 +199,7 @@ const path = svg.append("g")
     .attr("d", line);
 
 // Add an invisible layer for the interactive tip.
-const dot = svg.append("g")
+var dot = svg.append("g")
     .attr("display", "none");
 
 dot.append("circle")
@@ -218,13 +219,13 @@ svg
 // the corresponding line. Note: we don't actually use Voronoi here, since an exhaustive search
 // is fast enough.
 function pointermoved(event) {
-  const [xm, ym] = d3.pointer(event);
-  const i = d3.leastIndex(points, ([x, y]) => Math.hypot(x - xm, y - ym));
-  const [x, y, k] = points[i];
+  var [xm, ym] = d3.pointer(event);
+  var i = d3.leastIndex(points, ([x, y]) => Math.hypot(x - xm, y - ym));
+  var [x, y, k] = points[i];
   path.style("stroke", ({z}) => z === k ? null : "#ddd")
       .style("stroke-width",({z}) => z === k ? 4 : 1)
       .filter(({z}) => z === k).raise();
-  dot.attr("transform", `translate(${width},${y})`)
+  dot.attr("transform", `translate(${sa_width},${y})`)
       .select("text")
       .text(k)
       .style("font-size",20)

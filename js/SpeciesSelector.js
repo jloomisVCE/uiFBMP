@@ -1,9 +1,9 @@
 
-var sel_species;
+//var sel_species;
+let sel_species_toGet
 
-function getSpeciesResults() {
-    selectElement = 
-          document.querySelector('#Species_Select');
+function getSelected(){  
+    selectElement = document.querySelector('#Species_Select');
     sel_species = selectElement.value;
     sel_species_toGet = sel_species
     console.log(sel_species)
