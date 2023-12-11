@@ -1,0 +1,10 @@
+select {
+    margin-top: 15px;
+    margin-bottom: 25px;
+    background-color: white;
+}
+
+#titleDiv {
+    margin-left: 50px;
+    margin-bottom: 20px;
+}
