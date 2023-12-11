@@ -14,7 +14,7 @@ var td_height = ordTrend_positionInfo.height;
 
 // Set up the margins
 var td_margin = { top: td_height*0.05,
-               bottom: td_height*0.1,
+               bottom: td_height*0.05,
                right: td_width*0.05,  
                left: td_width*0.05 };
 
@@ -58,17 +58,18 @@ console.log('We got here bro');
 var svg = d3.select("#orderedTrends")
   .append("svg")
   .attr("width", td_width)
-  .attr("height", td_innerHeight)
+  .attr("height", td_height)
   .append("g")
   .attr("transform", "translate(" + td_margin.left + "," + td_margin.top + ")");
 
+  console.log(d3.range(trendSummary.length))
 // Set up the scales
 var xScale = d3.scaleBand()
   .domain(d3.range(trendSummary.length))
   .range([td_margin.left, td_innerWidth]);
 
 var yScale = d3.scaleLinear()
-  .domain([d3.min(trendSummary.map(d => d.trendLCI)), d3.max(trendSummary.map(d => d.trendLCI))])
+  .domain([d3.min(trendSummary.map(d => d.trendLCI)), d3.max(trendSummary.map(d => d.trendUCI))])
   .range([td_innerHeight, td_margin.top]);
 
   // Create the circle that travels along the curve of chart
@@ -102,8 +103,8 @@ var focusDrop = svg
 svg.selectAll("line")
   .data(trendSummary)
   .enter().append("line")
-  .attr("x1", (d, i) => xScale(i-1))
-  .attr("x2", (d, i) => xScale(i-1))
+  .attr("x1", (d, i) => xScale(i))
+  .attr("x2", (d, i) => xScale(i))
   .attr("y1", d => yScale(d.trendLCI))
   .attr("y2", d => yScale(d.trendUCI))
   .attr("stroke", "gray");  
@@ -112,9 +113,9 @@ svg.selectAll("line")
 svg.selectAll("circle")
 .data(trendSummary)
 .enter().append("circle")
-.attr("cx", (d, i) => xScale(i-1))
+.attr("cx", (d, i) => xScale(i))
 .attr("cy", d => yScale(d.trendTrend))
-.attr("r", 4)
+.attr("r", 4.5)
 .attr("fill", d => d.trendTrend < 0 ? "red" : "blue")
 .attr("opacity", d => d.trendStatSig ? "1" : "0.5")
 .attr("stroke", d => d.trendStatSig ? "black" : "gray")
@@ -135,9 +136,12 @@ function mouseover() {
 function mousemove(event) {
   // recover coordinate we need
   var y0 = yScale.invert(d3.pointer(event)[1]);
-  var i = d3.bisectRight(trendEst,y0);
+  var i = d3.bisectLeft(trendEst,y0);
+
+  console.log('i=: '+i)
 
   var selectedData = trendSummary[i]
+  console.log(selectedData)
   focus
     .attr("cx", xScale(i))
     .attr("cy", yScale(selectedData.trendTrend))
@@ -145,8 +149,8 @@ function mousemove(event) {
     .html(selectedData.trendSpecies)
     .style("font-size","18px")
     .style("font-weight","bold")
-    .attr("x", xScale(i+3))
-    .attr("y", yScale(selectedData.trendTrend))
+    .attr("x", xScale(i) + 15)
+    .attr("y", yScale(selectedData.trendTrend)-25)
   focusDrop
     .attr("x1", xScale(0))
     .attr("x2", xScale(0))
