@@ -22,8 +22,9 @@ var positionInfo = element_info.getBoundingClientRect();
   .attr('width', t_width)
   .attr('height', t_height);
 
-var sel_species = "CAWA";
-//let RelAbunEsts
+var sel_species = "OVEN";                  
+
+let RelAbunEsts
 
 getStateTrends({SOI: sel_species});
 
@@ -31,13 +32,13 @@ var dropDown = d3.select("#Species_Select")
                      .on("change", function() {
                      sel_species = this.value
                      console.log(this.value);
-                     getStateTrends()
+                     getStateTrends();
                      });
  
     // apicall
 function getStateTrends(){    
 
-/* UNCOMMENT THIS TO USE THE API - DONT FORGET TO UNCOMMENT THE } at end of doc
+// UNCOMMENT THIS TO USE THE API - DONT FORGET TO UNCOMMENT THE } at end of doc
 const fetchSpecies = fetch("http://vtatlasoflife.org:4321/vtabun?vtrelSpecies="+sel_species)
                      .then(function(response){ return response.json()});
 
@@ -47,7 +48,6 @@ Promise.resolve(fetchSpecies) // Waits for fetchPromise to get its value
   RelAbunEsts = res.rows
   console.log(RelAbunEsts)
 }).then(() => {
- */
   var sppIndices = RelAbunEstsDat
   .map((e, i) => e.vtrelSpecies === sel_species ? i : -1)
   .filter(index => index !== -1);
@@ -69,8 +69,30 @@ Promise.resolve(fetchSpecies) // Waits for fetchPromise to get its value
     console.log(t_xScale(2020));
 
   var t_yScale = d3.scaleLinear()
-    .domain([d3.min(RelAbunEsts.map(d => d.vtrelLCI)), d3.max(RelAbunEsts.map(d => d.vtrelUCI))])
+    //.domain([d3.min(RelAbunEsts.map(d => d.vtrelLCI)), d3.max(RelAbunEsts.map(d => d.vtrelUCI))])
+    .domain([0,12])
     .range([t_innerHeight, t_margin.top]);
+
+  /*svg.selectAll('text')
+  .enter()
+  .transition()
+  .duration(1000)
+  .style("opacity", 0)
+  .transition().duration(500)
+  .style("opacity", 1)
+  .text(sel_species);
+  */
+ svg.selectAll("polygon").remove() 
+ svg.selectAll("circle").remove()
+ svg.selectAll("path").remove()
+ svg.selectAll("text").remove()
+
+ var sppLabel = svg.append('text')
+ .attr("y", t_margin.top)
+ .attr("x", t_margin.left)
+ .text(sel_species)
+ .style("font-weight","bold")
+ .style("font-size","16pt")
 
   // Draw the confidence interval polygon
   var confidenceInterval = svg.append('polygon')
@@ -199,7 +221,5 @@ svg.append("text")
   svg.append('g')
     .attr('transform', `translate(${t_margin.left})`)
     .call(d3.axisLeft(t_yScale));
+});  
 }
-
-//);  
-//}
