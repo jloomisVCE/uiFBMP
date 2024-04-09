@@ -1,4 +1,4 @@
-let apiFBMP = 'http://vtatlasoflife.org:4321';
+let apiFBMP = 'https://vtatlasoflife.org:4321';
 
 export async function fetchFBMP(fbmpRoute='vtabun', searchTerm=false) {
     
